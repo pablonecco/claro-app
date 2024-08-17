@@ -1,16 +1,16 @@
 package com.example.claro_application.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Builder
 @Table (name="customer")
 public class Customer {
     @Id
@@ -24,16 +24,20 @@ public class Customer {
     private String lastName;
 
     @Column(name="document")
-    private int document;
+    private Integer document;
 
     @Column(name="number")
     private int number;
 
     @Column(name="created_at")
     @CreationTimestamp
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name="updated_at")
     @UpdateTimestamp
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name="plan_id")
+    private Plan plan;
 }
