@@ -6,6 +6,8 @@ import com.example.claro_application.services.implementation.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,19 +21,29 @@ public class PlanController {
 
     @Operation(summary = "Obtiene un plan a través de la variable ID en la URL.")
     @GetMapping("/{id}")
-    public Plan findPlanById (@PathVariable("id") int id) {
-        return planService.findById(id);
+    public ResponseEntity<Plan> findPlanById (@PathVariable("id") int id) {
+        Plan plan = planService.findById(id);
+        if (plan==null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(plan);
+        }
     }
 
     @Operation(summary = "Recupera una lista con todos los planes.")
     @GetMapping("/all")
-    public List<Plan> findAll () {
-        return planService.getAll();
+    public ResponseEntity<List<Plan>> findAll () {
+        List<Plan> plans = planService.getAll();
+        if (plans == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(plans);
+        }
     }
 
     @Operation(summary = "Crea un nuevo plan. Enviar objeto con: name, mb, minutes, price y sms.")
     @PostMapping("/create")
-    public Plan createPlan (@RequestBody CreatePlanDTO planDTO) {
+    public ResponseEntity<Plan> createPlan (@RequestBody CreatePlanDTO planDTO) {
 
         Plan plan = Plan.builder()
                 .price(planDTO.getPrice())
@@ -41,13 +53,18 @@ public class PlanController {
                 .name(planDTO.getName())
                 .build();
 
-        return planService.insertOrUpdate(plan);
+        planService.insertOrUpdate(plan);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(plan);
     }
 
     @Operation(summary = "Actualiza las caracteristicas del plan. Recibe objeto con los datos nuevos y ID del plan a modificar.")
     @PutMapping("/update/{id}")
-    public Plan updatePlan (@PathVariable("id") int id, @RequestBody CreatePlanDTO planUpdateDataDTO) {
+    public ResponseEntity<Plan> updatePlan (@PathVariable("id") int id, @RequestBody CreatePlanDTO planUpdateDataDTO) {
         Plan planAux = planService.findById(id);
+        if (planAux == null) {
+            return ResponseEntity.notFound().build();
+        }
         if (planUpdateDataDTO.getMb() != null) {
             planAux.setMb(planUpdateDataDTO.getMb());
         }
@@ -63,7 +80,8 @@ public class PlanController {
         if (planUpdateDataDTO.getName() != null) {
             planAux.setName(planUpdateDataDTO.getName());
         }
-        return planService.insertOrUpdate(planAux);
+        planService.insertOrUpdate(planAux);
+        return ResponseEntity.ok(planAux);
     }
 
     @Operation(summary = "Elimina un plan a través de la variable ID en la URL.")

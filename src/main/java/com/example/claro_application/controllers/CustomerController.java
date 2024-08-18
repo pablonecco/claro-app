@@ -2,11 +2,14 @@ package com.example.claro_application.controllers;
 
 import com.example.claro_application.controllers.request.CreateCustomerDTO;
 import com.example.claro_application.entities.Customer;
+import com.example.claro_application.entities.Plan;
 import com.example.claro_application.services.implementation.CustomerService;
 import com.example.claro_application.services.implementation.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,35 +27,56 @@ public class CustomerController {
 
     @Operation(summary = "Obtiene un cliente a través de la variable ID en la URL.")
     @GetMapping("/{id}")
-    public Customer findCustomerById (@PathVariable("id") int id) {
-        return customerService.findById(id);
+    public ResponseEntity<Customer> findCustomerById (@PathVariable("id") int id) {
+        Customer customer = customerService.findById(id);
+        if (customer==null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(customer);
+        }
     }
 
     @Operation(summary = "Recupera una lista con todos los clientes.")
     @GetMapping("/all")
-    public List<Customer> findAll () {
-        return customerService.findAll();
+    public ResponseEntity<List<Customer>> findAll () {
+        List<Customer> customers = customerService.findAll();
+        if (customers.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(customers);
+        }
     }
 
     @Operation(summary = "Crea un nuevo cliente. Enviar objeto con: name, lastName, document y ID de plan.")
     @PostMapping("/create/{idPlan}")
-    public Customer createCustomer (@PathVariable("idPlan") int idPlan, @RequestBody CreateCustomerDTO customerDTO) {
+    public ResponseEntity<Customer> createCustomer (@PathVariable("idPlan") int idPlan, @RequestBody CreateCustomerDTO customerDTO) {
+        Plan plan = planService.findById(idPlan);
+
+        if (plan == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         Customer customer = Customer.builder()
                 .name(customerDTO.getName())
                 .lastName(customerDTO.getLastName())
                 .document(customerDTO.getDocument())
-                .plan(planService.findById(idPlan))
+                .plan(plan)
                 .number(customerService.generateNumber())
                 .build();
 
-        return customerService.insertOrUpdate(customer);
+        customerService.insertOrUpdate(customer);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(customer);
     }
 
     @Operation(summary = "Actualiza los datos de un cliente. Recibe objeto con los datos nuevos y ID del cliente a modificar.")
     @PutMapping("/update/{id}")
-    public Customer updateCustomer (@PathVariable("id") int id, @RequestBody CreateCustomerDTO customerUpdateDataDTO) {
+    public ResponseEntity<Customer> updateCustomer (@PathVariable("id") int id, @RequestBody CreateCustomerDTO customerUpdateDataDTO) {
         Customer customerAux = customerService.findById(id);
+        if (customerAux==null) {
+            return ResponseEntity.notFound().build();
+        }
+
         if (customerUpdateDataDTO.getName() != null) {
             customerAux.setName(customerUpdateDataDTO.getName());
         }
@@ -62,7 +86,9 @@ public class CustomerController {
         if (customerUpdateDataDTO.getDocument() != null) {
             customerAux.setDocument(customerUpdateDataDTO.getDocument());
         }
-        return customerService.insertOrUpdate(customerAux);
+        customerService.insertOrUpdate(customerAux);
+
+        return ResponseEntity.ok(customerAux);
     }
 
     @Operation(summary = "Elimina un cliente a través de la variable ID en la URL.")
