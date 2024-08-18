@@ -35,7 +35,7 @@ public class PlanController {
     public ResponseEntity<List<Plan>> findAll () {
         List<Plan> plans = planService.getAll();
         if (plans == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.ok(plans);
         }
