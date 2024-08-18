@@ -6,16 +6,19 @@ import com.example.claro_application.entities.Plan;
 import com.example.claro_application.services.implementation.CustomerService;
 import com.example.claro_application.services.implementation.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/customer")
+@Validated
 public class CustomerController {
     @Autowired
     @Qualifier("customerService")
@@ -49,7 +52,7 @@ public class CustomerController {
 
     @Operation(summary = "Crea un nuevo cliente. Enviar objeto con: name, lastName, document y ID de plan.")
     @PostMapping("/create/{idPlan}")
-    public ResponseEntity<Customer> createCustomer (@PathVariable("idPlan") int idPlan, @RequestBody CreateCustomerDTO customerDTO) {
+    public ResponseEntity<Customer> createCustomer (@PathVariable("idPlan") int idPlan, @Valid @RequestBody CreateCustomerDTO customerDTO) {
         Plan plan = planService.findById(idPlan);
 
         if (plan == null) {
@@ -71,21 +74,17 @@ public class CustomerController {
 
     @Operation(summary = "Actualiza los datos de un cliente. Recibe objeto con los datos nuevos y ID del cliente a modificar.")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Customer> updateCustomer (@PathVariable("id") int id, @RequestBody CreateCustomerDTO customerUpdateDataDTO) {
+    public ResponseEntity<Customer> updateCustomer (@PathVariable("id") int id, @Valid @RequestBody CreateCustomerDTO customerUpdateDataDTO) {
         Customer customerAux = customerService.findById(id);
+
         if (customerAux==null) {
             return ResponseEntity.notFound().build();
         }
 
-        if (customerUpdateDataDTO.getName() != null) {
-            customerAux.setName(customerUpdateDataDTO.getName());
-        }
-        if (customerUpdateDataDTO.getLastName() != null) {
-            customerAux.setLastName(customerUpdateDataDTO.getLastName());
-        }
-        if (customerUpdateDataDTO.getDocument() != null) {
-            customerAux.setDocument(customerUpdateDataDTO.getDocument());
-        }
+        customerAux.setLastName(customerUpdateDataDTO.getLastName());
+        customerAux.setName(customerUpdateDataDTO.getName());
+        customerAux.setDocument(customerUpdateDataDTO.getDocument());
+
         customerService.insertOrUpdate(customerAux);
 
         return ResponseEntity.ok(customerAux);

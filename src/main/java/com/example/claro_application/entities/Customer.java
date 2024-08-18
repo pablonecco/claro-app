@@ -24,7 +24,7 @@ public class Customer {
     private String lastName;
 
     @Column(name="document")
-    private Integer document;
+    private int document;
 
     @Column(name="number")
     private int number;

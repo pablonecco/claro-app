@@ -4,16 +4,19 @@ import com.example.claro_application.controllers.request.CreatePlanDTO;
 import com.example.claro_application.entities.Plan;
 import com.example.claro_application.services.implementation.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/plan")
+@Validated
 public class PlanController {
     @Autowired
     @Qualifier("planService")
@@ -43,7 +46,7 @@ public class PlanController {
 
     @Operation(summary = "Crea un nuevo plan. Enviar objeto con: name, mb, minutes, price y sms.")
     @PostMapping("/create")
-    public ResponseEntity<Plan> createPlan (@RequestBody CreatePlanDTO planDTO) {
+    public ResponseEntity<Plan> createPlan (@Valid @RequestBody CreatePlanDTO planDTO) {
 
         Plan plan = Plan.builder()
                 .price(planDTO.getPrice())
@@ -60,26 +63,18 @@ public class PlanController {
 
     @Operation(summary = "Actualiza las caracteristicas del plan. Recibe objeto con los datos nuevos y ID del plan a modificar.")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Plan> updatePlan (@PathVariable("id") int id, @RequestBody CreatePlanDTO planUpdateDataDTO) {
+    public ResponseEntity<Plan> updatePlan (@PathVariable("id") int id, @Valid @RequestBody CreatePlanDTO planUpdateDataDTO) {
         Plan planAux = planService.findById(id);
         if (planAux == null) {
             return ResponseEntity.notFound().build();
         }
-        if (planUpdateDataDTO.getMb() != null) {
-            planAux.setMb(planUpdateDataDTO.getMb());
-        }
-        if (planUpdateDataDTO.getSms() != null) {
-            planAux.setSms(planUpdateDataDTO.getSms());
-        }
-        if (planUpdateDataDTO.getMinutes() != null) {
-            planAux.setMinutes(planUpdateDataDTO.getMinutes());
-        }
-        if (planUpdateDataDTO.getPrice() != null) {
-            planAux.setPrice(planUpdateDataDTO.getPrice());
-        }
-        if (planUpdateDataDTO.getName() != null) {
-            planAux.setName(planUpdateDataDTO.getName());
-        }
+
+        planAux.setMb(planUpdateDataDTO.getMb());
+        planAux.setSms(planUpdateDataDTO.getSms());
+        planAux.setMinutes(planUpdateDataDTO.getMinutes());
+        planAux.setPrice(planUpdateDataDTO.getPrice());
+        planAux.setName(planUpdateDataDTO.getName());
+
         planService.insertOrUpdate(planAux);
         return ResponseEntity.ok(planAux);
     }

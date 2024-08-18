@@ -21,19 +21,16 @@ public class Plan {
     private String name;
 
     @Column(name="mb")
-    private Integer mb;
+    private int mb;
 
     @Column(name="minutes")
-    private Integer minutes;
+    private int minutes;
 
     @Column(name="sms")
-    private Integer sms;
-
-    //@OneToMany(fetch=FetchType.LAZY, mappedBy = "plan")
-    //private List<Customer> customers;
+    private int sms;
 
     @Column(name = "price")
-    private Integer price;
+    private int price;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

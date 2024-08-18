@@ -1,5 +1,7 @@
 package com.example.claro_application.controllers.request;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +9,13 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class CreateCustomerDTO {
+
+    @Size(min = 5, max = 20, message = "El nombre debe tener entre 5 y 20 caracteres")
     private String name;
+
+    @Size(min = 5, max = 20, message = "El apellido debe tener entre 5 y 20 caracteres")
     private String lastName;
-    private Integer document;
+
+    @NotNull
+    private int document;
 }
