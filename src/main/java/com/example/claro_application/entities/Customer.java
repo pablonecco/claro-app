@@ -29,15 +29,15 @@ public class Customer {
     @Column(name="number")
     private int number;
 
-    @Column(name="created_at")
-    @CreationTimestamp
+    @Column(name="created_at", nullable = false, updatable = false)
+    @CreationTimestamp //Fecha y hora de creación
     private LocalDateTime createdAt;
 
     @Column(name="updated_at")
-    @UpdateTimestamp
+    @UpdateTimestamp //Fecha y hora de actualización
     private LocalDateTime updatedAt;
 
-    @ManyToOne
+    @ManyToOne //Relacion muchos a uno con Plan
     @JoinColumn(name="plan_id")
     private Plan plan;
 }

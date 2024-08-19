@@ -14,6 +14,6 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("API Claro Documentation")
                         .version("1.0.0")
-                        .description("API para CRUD de clientes de Claro"));
+                        .description("API para CRUD de clientes y planes de Claro"));
     }
 }

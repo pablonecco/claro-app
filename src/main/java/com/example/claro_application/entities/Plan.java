@@ -32,11 +32,11 @@ public class Plan {
     @Column(name = "price")
     private int price;
 
-    @CreationTimestamp
+    @CreationTimestamp //Fecha y hora de creación
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime cretedAt;
 
-    @UpdateTimestamp
+    @UpdateTimestamp //Fecha y hora de actualización
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
